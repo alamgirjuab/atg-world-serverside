@@ -1,5 +1,6 @@
 const express = require('express');
 const { MongoClient } = require('mongodb');
+const ObjectId = require('mongodb').ObjectId;
 const cors = require('cors');
 require('dotenv').config();
 
@@ -25,6 +26,15 @@ async function run() {
             const blogs = await cursor.toArray();
             res.send(blogs);
         })
+
+        // Get Single Service
+        app.get('/blogs/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log('getting specific blog', id);
+            const query = { _id: ObjectId(id) };
+            const blog = await servicesCollection.findOne(query);
+            res.json(blog);
+        })
         // Post API
         app.post('/blogs', async (req, res) => {
             const blog = req.body;
@@ -32,6 +42,14 @@ async function run() {
 
             const result = await servicesCollection.insertOne(blog);
             console.log(result);
+            res.json(result);
+        })
+
+        // Delete API
+        app.delete('/blogs/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await servicesCollection.deleteOne(query);
             res.json(result);
         })
     }
